@@ -42,9 +42,8 @@
     
     <scm>
         <connection>scm:git:git@github.com:dyorgio/cpu-watcher.git</connection>
-        <developerConnection>scm:git:git@github.com:dyorgio/cpu-watcher.git</developerConnection>
+        <developerConnection>scm:git:git@cpu-watcher.github.com:dyorgio/cpu-watcher.git</developerConnection>
         <url>https://github.com/dyorgio/cpu-watcher.git</url>
-        <tag>cpu-watcher-1.0.0</tag>
     </scm>
     
     <properties>
