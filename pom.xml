@@ -11,7 +11,7 @@
     
     <name>Cpu Watcher</name>
 
-    <description>A java library to limit another process CPU usage.</description>
+    <description>A Java Library/App to limit another process CPU usage.</description>
     
     <url>https://github.com/dyorgio/cpu-watcher</url>
     

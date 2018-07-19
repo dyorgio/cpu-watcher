@@ -54,3 +54,5 @@ For only selected platform: win-universal, win-x64, mac-universal, mac-x64, linu
     <classifier>${platform}</classifier>
 </dependency>
 ```
+
+For other platforms (aix, ppc, solaris, freebsd, etc..) download source and adjust pom.xml.
