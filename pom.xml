@@ -170,62 +170,10 @@
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${version.maven.shade.plugin}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
                 <executions>
-                    <execution>
-                        <id>default</id><!-- Commons platforms Only: Window 32-64bits, Linux Desktop 32-64bits, Mac 64bits -->
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>com/sun/jna/darwin/*.*</exclude>
-                                        <exclude>com/sun/jna/aix*/*.*</exclude>
-                                        <exclude>com/sun/jna/freebsd-*/*.*</exclude>
-                                        <exclude>com/sun/jna/openbsd-*/*.*</exclude>
-                                        <exclude>com/sun/jna/sunos-*/*.*</exclude>
-                                        <exclude>com/sun/jna/linux-*/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/dnd/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/mac/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/unix/**/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/wince/*.*</exclude>
-                                        <exclude>com/sun/jna/platform/win32/COM/**/*.*</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>dyorgio.runtime.cpu.watcher.CpuWatcher</mainClass>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                                    <resources>
-                                        <resource>.a</resource>
-                                        <resource>libsigar-universal-macosx.dylib</resource>
-                                        <resource>.sl</resource>
-                                        <resource>libsigar-amd64-freebsd-6.so</resource>
-                                        <resource>libsigar-amd64-solaris.so</resource>
-                                        <resource>libsigar-ia64-hpux.so</resource>
-                                        <resource>libsigar-ia64-linux.so</resource>
-                                        <resource>libsigar-pa-hpux.so</resource>
-                                        <resource>libsigar-ppc-aix-5.so</resource>
-                                        <resource>libsigar-ppc64-aix-5.so</resource>
-                                        <resource>libsigar-ppc-linux.so</resource>
-                                        <resource>libsigar-ppc64-linux.so</resource>
-                                        <resource>libsigar-s390x-linux.so</resource>
-                                        <resource>libsigar-sparc-solaris.so</resource>
-                                        <resource>libsigar-sparc64-solaris.so</resource>
-                                        <resource>libsigar-x86-freebsd-5.so</resource>
-                                        <resource>libsigar-x86-freebsd-6.so</resource>
-                                        <resource>libsigar-x86-solaris.so</resource>
-                                    </resources>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>win-universal</id>
                         <phase>package</phase>
@@ -453,6 +401,61 @@
                                         <resource>.lib</resource>
                                         <resource>.a</resource>
                                         <resource>.dylib</resource>
+                                        <resource>.sl</resource>
+                                        <resource>libsigar-amd64-freebsd-6.so</resource>
+                                        <resource>libsigar-amd64-solaris.so</resource>
+                                        <resource>libsigar-ia64-hpux.so</resource>
+                                        <resource>libsigar-ia64-linux.so</resource>
+                                        <resource>libsigar-pa-hpux.so</resource>
+                                        <resource>libsigar-ppc-aix-5.so</resource>
+                                        <resource>libsigar-ppc64-aix-5.so</resource>
+                                        <resource>libsigar-ppc-linux.so</resource>
+                                        <resource>libsigar-ppc64-linux.so</resource>
+                                        <resource>libsigar-s390x-linux.so</resource>
+                                        <resource>libsigar-sparc-solaris.so</resource>
+                                        <resource>libsigar-sparc64-solaris.so</resource>
+                                        <resource>libsigar-x86-freebsd-5.so</resource>
+                                        <resource>libsigar-x86-freebsd-6.so</resource>
+                                        <resource>libsigar-x86-solaris.so</resource>
+                                    </resources>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default</id><!-- Commons platforms Only: Window 32-64bits, Linux Desktop 32-64bits, Mac 64bits -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>com/sun/jna/darwin/*.*</exclude>
+                                        <exclude>com/sun/jna/aix*/*.*</exclude>
+                                        <exclude>com/sun/jna/freebsd-*/*.*</exclude>
+                                        <exclude>com/sun/jna/openbsd-*/*.*</exclude>
+                                        <exclude>com/sun/jna/sunos-*/*.*</exclude>
+                                        <exclude>com/sun/jna/linux-*/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/dnd/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/mac/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/unix/**/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/wince/*.*</exclude>
+                                        <exclude>com/sun/jna/platform/win32/COM/**/*.*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>dyorgio.runtime.cpu.watcher.CpuWatcher</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resources>
+                                        <resource>.a</resource>
+                                        <resource>libsigar-universal-macosx.dylib</resource>
                                         <resource>.sl</resource>
                                         <resource>libsigar-amd64-freebsd-6.so</resource>
                                         <resource>libsigar-amd64-solaris.so</resource>
