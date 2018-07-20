@@ -33,14 +33,14 @@ cpuWatcher.join();
 As Standalone App:
 
 ```bash
-java -jar cpu-watcher-{{ lib-version }}.jar $PID $MAX_CPU
+java -jar cpu-watcher-{{ site.lib-version }}.jar $PID $MAX_CPU
 ```
 
 As Java Agent:
 
 Include this argument to your java command.
 ```bash
--javaagent:cpu-watcher-{{ lib-version }}.jar=$MAX_CPU
+-javaagent:cpu-watcher-{{ site.lib-version }}.jar=$MAX_CPU
 ```
 
 Maven
@@ -50,7 +50,7 @@ For common platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits 
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>{{ lib-version }}</version>
+    <version>{{ site.lib-version }}</version>
 </dependency>
 ```
 
@@ -59,7 +59,7 @@ For only selected platform: win-universal, win-x64, mac-universal, mac-x64, linu
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>{{ lib-version }}</version>
+    <version>{{ site.lib-version }}</version>
     <classifier>${platform}</classifier>
 </dependency>
 ```
