@@ -2,7 +2,7 @@ Cpu Watcher
 ===============
 [![Build Status](https://travis-ci.org/dyorgio/cpu-watcher.svg?branch=master)](https://travis-ci.org/dyorgio/cpu-watcher) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher)
 
-A Java Library/App to limit another process CPU usage.
+A Java Agent/Library/App to limit another process CPU usage.
 
 Why use it?
 -----
@@ -10,7 +10,7 @@ Why use it?
 
 Usage
 -----
-As a java library:
+As Java library:
 
 ```java
 // get target pid (on example we are using our own pid)
@@ -28,15 +28,22 @@ cpuWatcher.getCpuUsage();
 cpuWatcher.join();
 ```
 
-As standlone app:
+As Standalone App:
 
 ```bash
 java -jar cpu-watcher-${version}.jar $PID $MAX_CPU
 ```
 
+As Java Agent:
+
+Include this argument to your java command.
+```bash
+-javaagent:cpu-watcher-${version}.jar=$MAX_CPU
+```
+
 Maven
 -----
-For commom platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits support included.
+For common platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits support included.
 ```xml
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
