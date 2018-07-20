@@ -2,6 +2,8 @@ Cpu Watcher
 ===============
 [![Build Status](https://travis-ci.org/dyorgio/cpu-watcher.svg?branch=master)](https://travis-ci.org/dyorgio/cpu-watcher) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher/badge.svg?1)](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher)
 
+(https://dyorgio.github.io/cpu-watcher/)[GitHub Pages Site]
+
 A Java Agent/Library/App to limit another process CPU usage.
 
 Why use it?
@@ -31,14 +33,14 @@ cpuWatcher.join();
 As Standalone App:
 
 ```bash
-java -jar cpu-watcher-{{ lib.version }}.jar $PID $MAX_CPU
+java -jar cpu-watcher-{% lib.version %}.jar $PID $MAX_CPU
 ```
 
 As Java Agent:
 
 Include this argument to your java command.
 ```bash
--javaagent:cpu-watcher-{{ lib.version }}.jar=$MAX_CPU
+-javaagent:cpu-watcher-{% lib.version %}.jar=$MAX_CPU
 ```
 
 Maven
@@ -48,7 +50,7 @@ For common platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits 
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>{{ lib.version }}</version>
+    <version>{% lib.version %}</version>
 </dependency>
 ```
 
@@ -57,7 +59,7 @@ For only selected platform: win-universal, win-x64, mac-universal, mac-x64, linu
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>{{ lib.version }}</version>
+    <version>{% lib.version %}</version>
     <classifier>${platform}</classifier>
 </dependency>
 ```
