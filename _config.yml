@@ -1,2 +1,4 @@
 theme: jekyll-theme-cayman
 title: Cpu Watcher
+
+lib.version: 1.0.1
