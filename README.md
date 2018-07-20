@@ -48,7 +48,7 @@ For common platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits 
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>1.0.0</version>
+    <version>${version}</version>
 </dependency>
 ```
 
@@ -57,7 +57,7 @@ For only selected platform: win-universal, win-x64, mac-universal, mac-x64, linu
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>1.0.0</version>
+    <version>${version}</version>
     <classifier>${platform}</classifier>
 </dependency>
 ```
