@@ -15,9 +15,6 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher;
 
-import java.lang.instrument.Instrumentation;
-import org.hyperic.sigar.SigarException;
-
 /**
  *
  * @author dyorgio
@@ -118,15 +115,5 @@ public class CpuWatcher extends Thread {
 
         CpuWatcher watcher = new CpuWatcher(Integer.parseInt(args[0]), Float.valueOf(args[1]));
         watcher.start();
-    }
-    
-    public static void premain(String agentArgs, Instrumentation inst) {
-        try {
-            CpuWatcher watcher = new CpuWatcher(SigarUtil.getCurrentPid(), Float.valueOf(agentArgs));
-            watcher.start();
-        } catch (SigarException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(ex);
-        }
     }
 }

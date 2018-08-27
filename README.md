@@ -4,7 +4,7 @@ Cpu Watcher
 
 [GitHub Pages Site](https://dyorgio.github.io/cpu-watcher/)
 
-A Java Agent/Library/App to limit another process CPU usage.
+A Java Library/App to limit another process CPU usage.
 
 Why use it?
 -----
@@ -34,13 +34,6 @@ As Standalone App:
 
 ```bash
 java -jar cpu-watcher-{{ site.lib-version }}.jar $PID $MAX_CPU
-```
-
-As Java Agent:
-
-Include this argument to your java command.
-```bash
--javaagent:cpu-watcher-{{ site.lib-version }}.jar=$MAX_CPU
 ```
 
 Maven
