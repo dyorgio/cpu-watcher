@@ -24,6 +24,8 @@ CpuWatcher cpuWatcher = new CpuWatcher(pid, 50f * CpuWatcher.getOneCoreOnePercen
 cpuWatcher.start();
 // You can monitor current cpu usage too!
 cpuWatcher.getCpuUsage();
+// ... or change usage limit at runtime (null to disable limiter)
+cpuWatcher.setUsageLimit(null);
 // Wait for process (optional);
 cpuWatcher.join();
 ```

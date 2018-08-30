@@ -24,14 +24,17 @@ public class CpuWatcher extends Thread {
     private static final long ONE_MILLIS_IN_NANOS = 1000000l;
     private static final long ONE_SECOND_IN_NANOS = 1000l * ONE_MILLIS_IN_NANOS;
 
+    private static final long WAKEUP_LIMITER_UP = 500l * ONE_MILLIS_IN_NANOS;
+    private static final long WAKEUP_LIMITER_DOWN = -500l * ONE_MILLIS_IN_NANOS;
+
     private final long pid;
     private final int cpuCount;
-    private final float maxPercentage;
     private final AbstractProcessWatcher processWatcher;
 
+    private volatile Float usageLimit;
     private float cpuUsage;
 
-    public CpuWatcher(long pid, float maxPercentage) {
+    public CpuWatcher(long pid, Float usageLimit) {
         try {
             if (pid == SigarUtil.getCurrentPid()) {
                 throw new RuntimeException("You cannot use your own pid(" + pid + "), deadlock will occours.");
@@ -43,16 +46,25 @@ public class CpuWatcher extends Thread {
             throw new RuntimeException("Error while getting current process PID or CPU count.", t);
         }
         this.pid = pid;
-        this.maxPercentage = maxPercentage;
+        setUsageLimit(usageLimit);
         this.processWatcher = AbstractProcessWatcherFactory.getInstance().createWatcher(pid);
+
+        setDaemon(true);
     }
 
     public long getPid() {
         return pid;
     }
 
-    public float getMaxPercentage() {
-        return maxPercentage;
+    public void setUsageLimit(Float usageLimit) {
+        if (usageLimit != null && usageLimit < 0) {
+            throw new RuntimeException("Invalid usage limit (" + usageLimit + "), cannot be negative.");
+        }
+        this.usageLimit = usageLimit;
+    }
+
+    public Float getUsageLimit() {
+        return usageLimit;
     }
 
     public float getCpuUsage() {
@@ -67,45 +79,65 @@ public class CpuWatcher extends Thread {
     public void run() {
 
         CpuTimeSnapshot current;
-        processWatcher.suspend();
         CpuTimeSnapshot prev = processWatcher.getCpuTimes();
-        long wakeupAmount = 0;
-        float error;
-        try {
-            while (!isInterrupted()) {
-                try {
-                    if (wakeupAmount > 0) {
-                        processWatcher.resume();
-                        sleepNanoseconds(wakeupAmount);
+
+        Float localUsageLimit;
+
+        while (!isInterrupted()) {
+            try {
+                localUsageLimit = this.usageLimit;
+                if (localUsageLimit == null) {
+                    while (this.usageLimit == null) {
+                        Thread.sleep(500);
                         current = processWatcher.getCpuTimes();
-                        processWatcher.suspend();
                         cpuUsage = current.getCpuUsage(prev) / cpuCount;
-                        error = ((cpuUsage - maxPercentage) / 100f) * ONE_SECOND_IN_NANOS;
-                        wakeupAmount -= (long) error;
-                        if (error > 0) {
+                        prev = current;
+                    }
+                } else {
+                    processWatcher.suspend();
+                    long wakeupAmount = 0;
+                    float error;
+                    try {
+                        while ((localUsageLimit = this.usageLimit) != null) {
                             if (wakeupAmount > 0) {
-                                wakeupAmount -= ONE_MILLIS_IN_NANOS;
-                            }
-                        } else {
-                            if (wakeupAmount < 0) {
+                                processWatcher.resume();
+                                sleepNanoseconds(wakeupAmount);
+                                current = processWatcher.getCpuTimes();
+                                processWatcher.suspend();
+                                cpuUsage = current.getCpuUsage(prev) / cpuCount;
+                                error = ((cpuUsage - localUsageLimit) / 100f) * ONE_SECOND_IN_NANOS;
+                                wakeupAmount -= (long) error;
+                                if (error > 0) {
+                                    if (wakeupAmount > 0) {
+                                        wakeupAmount -= ONE_MILLIS_IN_NANOS;
+                                    }
+                                } else {
+                                    if (wakeupAmount < 0) {
+                                        wakeupAmount += ONE_MILLIS_IN_NANOS;
+                                    }
+                                }
+                                if (wakeupAmount > WAKEUP_LIMITER_UP) {
+                                    wakeupAmount = WAKEUP_LIMITER_UP;
+                                } else if (wakeupAmount < WAKEUP_LIMITER_DOWN) {
+                                    wakeupAmount = WAKEUP_LIMITER_DOWN;
+                                }
+                                prev = current;
+                            } else {
                                 wakeupAmount += ONE_MILLIS_IN_NANOS;
+                                Thread.sleep(1);
                             }
                         }
-                        prev = current;
-                    } else {
-                        wakeupAmount += ONE_MILLIS_IN_NANOS;
-                        Thread.sleep(1);
+                    } finally {
+                        try {
+                            processWatcher.resume();
+                        } catch (Exception ex) {
+                            //ignore
+                        }
                     }
-                } catch (InterruptedException ex) {
-                    // ignore interruptions errors
-                    break;
                 }
-            }
-        } finally {
-            try {
-                processWatcher.resume();
-            } catch (Exception ex) {
-                //ignore
+            } catch (InterruptedException ex) {
+                // ignore interruptions errors
+                break;
             }
         }
     }
@@ -131,12 +163,21 @@ public class CpuWatcher extends Thread {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        if (args == null || args.length != 2) {
-            System.out.println("Usage: sudo java -jar cpu-watcher.jar PID CPU_MAX_USAGE_PERCENTAGE");
+        if (args == null || args.length == 0) {
+            System.out.println("Usage: sudo java -jar cpu-watcher.jar PID [CPU_MAX_USAGE_PERCENTAGE]");
             System.exit(-1);
         }
 
-        CpuWatcher watcher = new CpuWatcher(Integer.parseInt(args[0]), Float.valueOf(args[1]));
+        Float limit = args.length == 2 ? Float.valueOf(args[1]) : null;
+        CpuWatcher watcher = new CpuWatcher(Integer.parseInt(args[0]), limit);
         watcher.start();
+        if (limit != null) {
+            while (!Thread.currentThread().isInterrupted()) {
+                System.out.println(watcher.getCpuUsage());
+                Thread.sleep(1000);
+            }
+        } else {
+            watcher.join();
+        }
     }
 }
