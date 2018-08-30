@@ -19,7 +19,7 @@ As Java library:
 // Target percentage is not per core, is always over the entire system load, 
 // on example above we want 50% of 1 core only, and host cpu has 8 cores (4 phisical, 4 HT).
 // 50%/8 = 6.25%
-CpuWatcher cpuWatcher = new CpuWatcher(pid, 6.25f);
+CpuWatcher cpuWatcher = new CpuWatcher(pid, 50f * CpuWatcher.getOneCoreOnePercent());
 // start watcher thread
 cpuWatcher.start();
 // You can monitor current cpu usage too!
