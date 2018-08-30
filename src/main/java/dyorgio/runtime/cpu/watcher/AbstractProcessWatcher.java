@@ -48,18 +48,10 @@ public abstract class AbstractProcessWatcher {
         resumed = true;
     }
 
-    public CpuTimes getCpuTimes() {
+    public CpuTimeSnapshot getCpuTimes() {
         try {
             ProcCpu procCpu = SigarUtil.getSigar().getProcCpu(this.pid);
-
-            long userTime = (procCpu.getUser() * 1000);
-            long systemTime = (procCpu.getSys() * 1000);
-
-            return new CpuTimes(//
-                    userTime,//
-                    systemTime,//
-                    ((procCpu.getLastTime() - procCpu.getStartTime()) * SigarUtil.getCpuCount()) - (userTime + systemTime) ////
-            );
+            return new CpuTimeSnapshot(procCpu.getTotal(), procCpu.getLastTime());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

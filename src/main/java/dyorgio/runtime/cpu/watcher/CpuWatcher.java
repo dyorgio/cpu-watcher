@@ -21,17 +21,27 @@ package dyorgio.runtime.cpu.watcher;
  */
 public class CpuWatcher extends Thread {
 
-    private static final long MAX_SLEEP_AMOUNT = 100000;
-    private static final long MIN_SLEEP_AMOUNT = 20000;
+    private static final long ONE_MILLIS_IN_NANOS = 1000000l;
+    private static final long ONE_SECOND_IN_NANOS = 1000l * ONE_MILLIS_IN_NANOS;
 
     private final long pid;
+    private final int cpuCount;
     private final float maxPercentage;
     private final AbstractProcessWatcher processWatcher;
 
-    private long sleepAmount = MIN_SLEEP_AMOUNT;
     private float cpuUsage;
 
     public CpuWatcher(long pid, float maxPercentage) {
+        try {
+            if (pid == SigarUtil.getCurrentPid()) {
+                throw new RuntimeException("You cannot use your own pid(" + pid + "), deadlock will occours.");
+            }
+            cpuCount = SigarUtil.getCpuCount();
+        } catch (RuntimeException r) {
+            throw r;
+        } catch (Throwable t) {
+            throw new RuntimeException("Error while getting current process PID or CPU count.", t);
+        }
         this.pid = pid;
         this.maxPercentage = maxPercentage;
         this.processWatcher = AbstractProcessWatcherFactory.getInstance().createWatcher(pid);
@@ -48,63 +58,76 @@ public class CpuWatcher extends Thread {
     public float getCpuUsage() {
         return cpuUsage;
     }
-    
-    @Override
-    public void run() {
-        CpuTimes current;
-        processWatcher.resume();
-        CpuTimes prev = processWatcher.getCpuTimes();
-        float error;
-        while (!isInterrupted()) {
-            try {
-                current = processWatcher.getCpuTimes();
 
-                cpuUsage = current.getCpuUsage(prev) / SigarUtil.getCpuCount();
-
-                error = (cpuUsage - maxPercentage) / 100f;
-
-                if (sleepAmount == 0.0 && error > 0.0) {
-                    sleepAmount = MIN_SLEEP_AMOUNT;
-                }
-
-                sleepAmount += (int) (error * MIN_SLEEP_AMOUNT);
-
-                if (sleepAmount < MIN_SLEEP_AMOUNT) {
-                    sleepAmount = 0;
-                }
-
-                if (sleepAmount > MAX_SLEEP_AMOUNT) {
-                    sleepAmount = MAX_SLEEP_AMOUNT;
-                }
-
-                if (sleepAmount >= MIN_SLEEP_AMOUNT) {
-                    processWatcher.suspend();
-                    sleepNanoseconds(sleepAmount);
-                    processWatcher.resume();
-                }
-                prev = current;
-                sleepNanoseconds(MAX_SLEEP_AMOUNT - sleepAmount);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-
-        processWatcher.resume();
+    public AbstractProcessWatcher getProcessWatcher() {
+        return processWatcher;
     }
 
-    private void sleepNanoseconds(long nanos) throws InterruptedException {
-        if (nanos == 0) {
+    @Override
+    public void run() {
+
+        CpuTimeSnapshot current;
+        processWatcher.suspend();
+        CpuTimeSnapshot prev = processWatcher.getCpuTimes();
+        long wakeupAmount = 0;
+        float error;
+        try {
+            while (!isInterrupted()) {
+                try {
+                    if (wakeupAmount > 0) {
+                        processWatcher.resume();
+                        sleepNanoseconds(wakeupAmount);
+                        current = processWatcher.getCpuTimes();
+                        processWatcher.suspend();
+                        cpuUsage = current.getCpuUsage(prev) / cpuCount;
+                        error = ((cpuUsage - maxPercentage) / 100f) * ONE_SECOND_IN_NANOS;
+                        wakeupAmount -= (long) error;
+                        if (error > 0) {
+                            if (wakeupAmount > 0) {
+                                wakeupAmount -= ONE_MILLIS_IN_NANOS;
+                            }
+                        } else {
+                            if (wakeupAmount < 0) {
+                                wakeupAmount += ONE_MILLIS_IN_NANOS;
+                            }
+                        }
+                        prev = current;
+                    } else {
+                        wakeupAmount += ONE_MILLIS_IN_NANOS;
+                        Thread.sleep(1);
+                    }
+                } catch (InterruptedException ex) {
+                    // ignore interruptions errors
+                    break;
+                }
+            }
+        } finally {
+            try {
+                processWatcher.resume();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+
+    private static void sleepNanoseconds(long nanos) throws InterruptedException {
+        if (nanos <= 0) {
             return;
         }
         long millisPart = 0;
-        int nanosPart;
         if (nanos > 999999) {
-            millisPart = nanos / 1000000;
-            nanosPart = (int) (nanos - (millisPart * 1000000));
-        } else {
-            nanosPart = (int) nanos;
+            millisPart = nanos / ONE_MILLIS_IN_NANOS;
+            nanos = nanos - (millisPart * ONE_MILLIS_IN_NANOS);
         }
-        Thread.sleep(millisPart, nanosPart);
+        Thread.sleep(millisPart, (int) nanos);
+    }
+
+    public static float getOneCoreOnePercent() {
+        try {
+            return 1f / SigarUtil.getCpuCount();
+        } catch (Throwable t) {
+            throw new RuntimeException("Error while getting CPU count.", t);
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {

@@ -13,20 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************** */
-package dyorgio.runtime.cpu.watcher.platform;
+package dyorgio.runtime.cpu.watcher;
 
-import dyorgio.runtime.cpu.watcher.PosixProcessWatcher;
-import dyorgio.runtime.cpu.watcher.AbstractProcessWatcher;
-import dyorgio.runtime.cpu.watcher.AbstractProcessWatcherFactory;
+import org.hyperic.sigar.SigarException;
 
 /**
  *
  * @author dyorgio
  */
-public class LinuxProcessWatcherFactory extends AbstractProcessWatcherFactory {
+public class PosixProcessWatcher extends AbstractProcessWatcher {
+
+    public PosixProcessWatcher(long pid) {
+        super(pid);
+    }
 
     @Override
-    public AbstractProcessWatcher createWatcher(long pid) {
-        return new PosixProcessWatcher(pid);
+    protected void suspendImpl() {
+        try {
+            SigarUtil.getSigar().kill(pid, "SIGSTOP");
+        } catch (SigarException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    protected void resumeImpl() {
+        try {
+            SigarUtil.getSigar().kill(pid, "SIGCONT");
+        } catch (SigarException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

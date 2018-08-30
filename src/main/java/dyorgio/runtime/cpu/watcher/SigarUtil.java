@@ -31,7 +31,7 @@ import org.hyperic.sigar.SigarLoader;
  *
  * @author dyorgio
  */
-public class SigarUtil {
+class SigarUtil {
 
     private static final Logger LOGGER = Logger.getLogger(SigarUtil.class.getName());
 

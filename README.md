@@ -15,9 +15,7 @@ Usage
 As Java library:
 
 ```java
-// get target pid (on example we are using our own pid)
-long pid = SigarUtil.getCurrentPid();
-// Create a new CpuWatcher object. 
+// Create a new CpuWatcher object with target PID (own pid throws exception to prevents deadlock). 
 // Target percentage is not per core, is always over the entire system load, 
 // on example above we want 50% of 1 core only, and host cpu has 8 cores (4 phisical, 4 HT).
 // 50%/8 = 6.25%

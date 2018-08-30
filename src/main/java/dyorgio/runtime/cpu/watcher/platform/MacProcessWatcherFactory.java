@@ -15,6 +15,7 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher.platform;
 
+import dyorgio.runtime.cpu.watcher.PosixProcessWatcher;
 import dyorgio.runtime.cpu.watcher.AbstractProcessWatcher;
 import dyorgio.runtime.cpu.watcher.AbstractProcessWatcherFactory;
 

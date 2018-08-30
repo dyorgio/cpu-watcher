@@ -13,37 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************** */
-package dyorgio.runtime.cpu.watcher.platform;
-
-import dyorgio.runtime.cpu.watcher.AbstractProcessWatcher;
-import dyorgio.runtime.cpu.watcher.SigarUtil;
-import org.hyperic.sigar.SigarException;
+package dyorgio.runtime.cpu.watcher;
 
 /**
  *
  * @author dyorgio
  */
-class PosixProcessWatcher extends AbstractProcessWatcher {
+public class CpuTimeSnapshot {
 
-    PosixProcessWatcher(long pid) {
-        super(pid);
+    private final double total;
+    private final double timestamp;
+
+    public CpuTimeSnapshot(long total, long timestamp) {
+        this.total = total;
+        this.timestamp = timestamp;
+    }
+
+    public float getCpuUsage(CpuTimeSnapshot previous) {
+        double delta = (timestamp - previous.timestamp);
+        return delta == 0 ? 0 : (float) ((total - previous.total) / delta) * 100f;
     }
 
     @Override
-    protected void suspendImpl() {
-        try {
-            SigarUtil.getSigar().kill(pid, "SIGSTOP");
-        } catch (SigarException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @Override
-    protected void resumeImpl() {
-        try {
-            SigarUtil.getSigar().kill(pid, "SIGCONT");
-        } catch (SigarException ex) {
-            throw new RuntimeException(ex);
-        }
+    public String toString() {
+        return "\ttotal:" + total + "\r\n"
+                + "\ttimastamp:" + timestamp;
     }
 }
