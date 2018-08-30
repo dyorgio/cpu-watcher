@@ -185,26 +185,6 @@
                 <version>${version.maven.shade.plugin}</version>
                 <configuration>
                     <createDependencyReducedPom>true</createDependencyReducedPom>
-<!--                    <relocations combine.children="append">
-                        <relocation>
-                            <pattern>org.hyperic</pattern>
-                            <shadedPattern>
-                                dyorgio.runtime.cpu.watcher.deps.org.hyperic
-                            </shadedPattern>
-                            <includes>
-                                <include>org.hyperic.**</include>
-                            </includes>
-                        </relocation>
-                        <relocation>
-                            <pattern>com.sun</pattern>
-                            <shadedPattern>
-                                dyorgio.runtime.cpu.watcher.deps.com.sun
-                            </shadedPattern>
-                            <includes>
-                                <include>com.sun.**</include>
-                            </includes>
-                        </relocation>
-                    </relocations>-->
                 </configuration>
                 <executions>
                     <execution>
@@ -567,6 +547,10 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
