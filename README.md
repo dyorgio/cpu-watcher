@@ -2,13 +2,18 @@ Cpu Watcher
 ===============
 [![Build Status](https://travis-ci.org/dyorgio/cpu-watcher.svg?branch=master)](https://travis-ci.org/dyorgio/cpu-watcher) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher/badge.svg?1)](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher)
 
-[GitHub Pages Site](https://dyorgio.github.io/cpu-watcher/)
-
-A Java Library/App to limit another process CPU usage.
+A Java Library/App to monitor/limit another process CPU usage.
 
 Why use it?
 -----
 * Limit any process cpu time usage in a multiplatform way.
+
+Who it works
+-----
+Using a new thread to each external process that you want to monitor/limit this library watches cpu times and sends a signal according with cpu specified limit.
+
+* SIGSTOP/SIGCONT on macos/linux
+* NtSuspendProcess/NtResumeProcess on Windows.
 
 Usage
 -----
