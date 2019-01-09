@@ -43,16 +43,17 @@ java -jar cpu-watcher-{{ site.lib-version }}.jar $PID $MAX_CPU
 
 Maven
 -----
-For common platforms: Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits support included.
+With common platforms support (Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits):
 ```xml
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
     <version>{{ site.lib-version }}</version>
+    <!-- no classifier -->
 </dependency>
 ```
 
-For only selected platform: win-universal, win-x64, mac-universal, mac-x64, linux-universal, linux-desktop-universal
+With only one platform (win-universal, win-x64, mac-universal, mac-x64, linux-universal, linux-desktop-universal):
 ```xml
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
