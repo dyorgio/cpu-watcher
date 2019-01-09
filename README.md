@@ -8,9 +8,9 @@ Why use it?
 -----
 * Limit any process cpu time usage in a multiplatform way.
 
-Who it works
+How it works?
 -----
-Using a new thread to each external process that you want to monitor/limit this library watches cpu times and sends a signal according with cpu specified limit.
+Using a new thread to each external process that you want to monitor/limit this library watches cpu times and sends signals according with cpu specified limit and timelapse.
 
 * SIGSTOP/SIGCONT on macos/linux
 * NtSuspendProcess/NtResumeProcess on Windows.
