@@ -15,11 +15,14 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher;
 
+import org.hyperic.sigar.SigarException;
+
 /**
+ * Thread to watch and, optionally, limit another process cpu usage.
  *
  * @author dyorgio
  */
-public class CpuWatcher extends Thread {
+public final class CpuWatcher extends Thread {
 
     private static final long ONE_MILLIS_IN_NANOS = 1000000l;
     private static final long ONE_SECOND_IN_NANOS = 1000l * ONE_MILLIS_IN_NANOS;
@@ -35,6 +38,11 @@ public class CpuWatcher extends Thread {
     private float cpuUsage;
 
     public CpuWatcher(long pid, Float usageLimit) {
+        this(null, pid, usageLimit);
+    }
+
+    public CpuWatcher(ThreadGroup group, long pid, Float usageLimit) {
+        super(group, null, "CpuWatcher[PID:" + pid + "]", 32l * 1024l);
         try {
             if (pid == SigarUtil.getCurrentPid()) {
                 throw new RuntimeException("You cannot use your own pid(" + pid + "), deadlock will occours.");
@@ -42,8 +50,8 @@ public class CpuWatcher extends Thread {
             cpuCount = SigarUtil.getCpuCount();
         } catch (RuntimeException r) {
             throw r;
-        } catch (Throwable t) {
-            throw new RuntimeException("Error while getting current process PID or CPU count.", t);
+        } catch (SigarException t) {
+            throw new RuntimeException("Error while getting CPU count.", t);
         }
         this.pid = pid;
         setUsageLimit(usageLimit);
@@ -76,6 +84,7 @@ public class CpuWatcher extends Thread {
     }
 
     @Override
+    @SuppressWarnings("SleepWhileInLoop")
     public void run() {
 
         CpuTimeSnapshot current;
@@ -157,11 +166,12 @@ public class CpuWatcher extends Thread {
     public static float getOneCoreOnePercent() {
         try {
             return 1f / SigarUtil.getCpuCount();
-        } catch (Throwable t) {
+        } catch (SigarException t) {
             throw new RuntimeException("Error while getting CPU count.", t);
         }
     }
 
+    @SuppressWarnings("SleepWhileInLoop")
     public static void main(String[] args) throws InterruptedException {
         if (args == null || args.length == 0) {
             System.out.println("Usage: sudo java -jar cpu-watcher.jar PID [CPU_MAX_USAGE_PERCENTAGE]");
