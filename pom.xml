@@ -173,9 +173,6 @@
                     <archive>
                         <manifestEntries>
                             <Main-Class>dyorgio.runtime.cpu.watcher.CpuWatcher</Main-Class>
-                            <Can-Redefine-Classes>false</Can-Redefine-Classes>
-                            <Can-Retransform-Classes>false</Can-Retransform-Classes>
-                            <Premain-Class>dyorgio.runtime.cpu.watcher.CpuWatcher</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -196,6 +193,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>win-universal</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -236,6 +234,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>win-x64</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -279,6 +278,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>mac-x64</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -310,6 +310,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>mac-universal</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -340,6 +341,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>linux-universal</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -381,6 +383,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>linux-desktop-universal</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -424,6 +427,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
