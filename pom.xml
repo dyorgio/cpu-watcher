@@ -64,6 +64,7 @@
         <version.sigar.base>1.6.5</version.sigar.base>
         <version.sigar>${version.sigar.base}.132</version.sigar>
         <version.junit>4.12</version.junit>
+        <version.out-process>1.2.6</version.out-process>
     </properties>
     
     <repositories>
@@ -96,6 +97,18 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dyorgio.runtime</groupId>
+            <artifactId>out-process</artifactId>
+            <version>${version.out-process}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -510,6 +523,8 @@
                         <version>${version.maven.release.plugin}</version>
                         <configuration>
                             <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <localCheckout>true</localCheckout>
+                            <pushChanges>false</pushChanges>
                             <useReleaseProfile>false</useReleaseProfile>
                             <releaseProfiles>release</releaseProfiles>
                             <goals>deploy</goals>
@@ -569,6 +584,27 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>de.jutzig</groupId>
+                        <artifactId>github-release-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <configuration>
+                            <description>
+Improved getCpuUsage() precision.
+Added unit tests.
+                            </description>
+                            <releaseName>${project.version}</releaseName>
+                            <tag>${project.version}</tag>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${project.artifactId}*.jar</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

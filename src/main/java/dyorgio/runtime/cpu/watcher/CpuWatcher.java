@@ -35,7 +35,7 @@ public final class CpuWatcher extends Thread {
     private final AbstractProcessWatcher processWatcher;
 
     private volatile Float usageLimit;
-    private float cpuUsage;
+    private CpuTimeSnapshot prev;
 
     public CpuWatcher(long pid, Float usageLimit) {
         this(null, pid, usageLimit);
@@ -76,7 +76,17 @@ public final class CpuWatcher extends Thread {
     }
 
     public float getCpuUsage() {
-        return cpuUsage;
+        if (prev != null) {
+            CpuTimeSnapshot current = processWatcher.getCpuTimes();
+            try {
+                return current.getCpuUsage(prev) / cpuCount;
+            } finally {
+                prev = current;
+            }
+        } else {
+            prev = processWatcher.getCpuTimes();
+            return 0;
+        }
     }
 
     public AbstractProcessWatcher getProcessWatcher() {
@@ -91,6 +101,7 @@ public final class CpuWatcher extends Thread {
         CpuTimeSnapshot prev = processWatcher.getCpuTimes();
 
         Float localUsageLimit;
+        float cpuUsage;
 
         while (!isInterrupted()) {
             try {
@@ -98,55 +109,51 @@ public final class CpuWatcher extends Thread {
                 if (localUsageLimit == null) {
                     while (this.usageLimit == null) {
                         Thread.sleep(500);
-                        current = processWatcher.getCpuTimes();
-                        cpuUsage = current.getCpuUsage(prev) / cpuCount;
-                        prev = current;
+                        prev = processWatcher.getCpuTimes();
                     }
                 } else {
                     processWatcher.suspend();
                     long wakeupAmount = 0;
                     float error;
-                    try {
-                        while ((localUsageLimit = this.usageLimit) != null) {
-                            if (wakeupAmount > 0) {
-                                processWatcher.resume();
-                                sleepNanoseconds(wakeupAmount);
-                                current = processWatcher.getCpuTimes();
-                                processWatcher.suspend();
-                                cpuUsage = current.getCpuUsage(prev) / cpuCount;
-                                error = ((cpuUsage - localUsageLimit) / 100f) * ONE_SECOND_IN_NANOS;
-                                wakeupAmount -= (long) error;
-                                if (error > 0) {
-                                    if (wakeupAmount > 0) {
-                                        wakeupAmount -= ONE_MILLIS_IN_NANOS;
-                                    }
-                                } else {
-                                    if (wakeupAmount < 0) {
-                                        wakeupAmount += ONE_MILLIS_IN_NANOS;
-                                    }
-                                }
-                                if (wakeupAmount > WAKEUP_LIMITER_UP) {
-                                    wakeupAmount = WAKEUP_LIMITER_UP;
-                                } else if (wakeupAmount < WAKEUP_LIMITER_DOWN) {
-                                    wakeupAmount = WAKEUP_LIMITER_DOWN;
-                                }
-                                prev = current;
-                            } else {
-                                wakeupAmount += ONE_MILLIS_IN_NANOS;
-                                Thread.sleep(1);
-                            }
-                        }
-                    } finally {
-                        try {
+                    while ((localUsageLimit = this.usageLimit) != null) {
+                        if (wakeupAmount > 0) {
                             processWatcher.resume();
-                        } catch (Exception ex) {
-                            //ignore
+                            sleepNanoseconds(wakeupAmount);
+                            current = processWatcher.getCpuTimes();
+                            processWatcher.suspend();
+                            cpuUsage = current.getCpuUsage(prev) / cpuCount;
+                            error = ((cpuUsage - localUsageLimit) / 100f) * ONE_SECOND_IN_NANOS;
+                            wakeupAmount -= (long) error;
+                            if (error > 0) {
+                                if (wakeupAmount > 0) {
+                                    wakeupAmount -= ONE_MILLIS_IN_NANOS;
+                                }
+                            } else if (wakeupAmount < 0) {
+                                wakeupAmount += ONE_MILLIS_IN_NANOS;
+                            }
+                            if (wakeupAmount > WAKEUP_LIMITER_UP) {
+                                wakeupAmount = WAKEUP_LIMITER_UP;
+                            } else if (wakeupAmount < WAKEUP_LIMITER_DOWN) {
+                                wakeupAmount = WAKEUP_LIMITER_DOWN;
+                            }
+                            prev = current;
+                        } else {
+                            wakeupAmount += ONE_MILLIS_IN_NANOS;
+                            Thread.sleep(1);
                         }
                     }
+
                 }
             } catch (InterruptedException ex) {
                 // ignore interruptions errors
+                interrupt();
                 break;
+            } finally {
+                try {
+                    processWatcher.resume();
+                } catch (Exception ex) {
+                    //ignore
+                }
             }
         }
     }
