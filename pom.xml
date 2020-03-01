@@ -60,7 +60,7 @@
         <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
         <version.maven.shade.plugin>3.1.1</version.maven.shade.plugin>
         
-        <version.jna>4.5.2</version.jna>
+        <version.jna>5.5.0</version.jna>
         <version.sigar.base>1.6.5</version.sigar.base>
         <version.sigar>${version.sigar.base}.132</version.sigar>
         <version.junit>4.12</version.junit>
