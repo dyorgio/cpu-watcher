@@ -2,4 +2,4 @@ language: java
 os: linux
 dist: xenial
 jdk:
-  - oraclejdk8
+  - openjdk8
