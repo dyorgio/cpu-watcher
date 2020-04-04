@@ -55,22 +55,27 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         
         <version.maven.compiler.plugin>3.7.0</version.maven.compiler.plugin>
-        <version.animal.sniffer.maven.plugin>1.16</version.animal.sniffer.maven.plugin>
+        <version.animal.sniffer.maven.plugin>1.18</version.animal.sniffer.maven.plugin>
         <version.maven.release.plugin>2.5.3</version.maven.release.plugin>
         <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
         <version.maven.shade.plugin>3.1.1</version.maven.shade.plugin>
         
         <version.jna>5.5.0</version.jna>
         <version.sigar.base>1.6.5</version.sigar.base>
-        <version.sigar>${version.sigar.base}.132</version.sigar>
+        <version.sigar>${version.sigar.base}.132-7</version.sigar>
+        <version.sigar-dist>${version.sigar.base}.132-6</version.sigar-dist>
         <version.junit>4.12</version.junit>
-        <version.out-process>1.2.6</version.out-process>
+        <version.out-process>1.2.7-SNAPSHOT</version.out-process>
     </properties>
     
     <repositories>
         <repository>
-            <id>sigar</id>
+            <id>sigar-jboss</id>
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/</url>
+        </repository>
+        <repository>
+            <id>sigar-redhat</id>
+            <url>https://maven.repository.redhat.com/ga/</url>
         </repository>
     </repositories>
     
@@ -89,7 +94,7 @@
             <groupId>org.hyperic</groupId>
             <artifactId>sigar-dist</artifactId>
             <type>zip</type>
-            <version>${version.sigar}</version>
+            <version>${version.sigar-dist}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -136,6 +141,9 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <ignores>
+                                <ignore>java.lang.invoke.*</ignore>
+                            </ignores>
                             <signature>
                                 <groupId>org.codehaus.mojo.signature</groupId>
                                 <artifactId>java17</artifactId>
@@ -593,6 +601,7 @@
                             <description>
 Improved getCpuUsage() precision.
 Added unit tests.
+Improved support to Java > 9.
                             </description>
                             <releaseName>${project.version}</releaseName>
                             <tag>${project.version}</tag>

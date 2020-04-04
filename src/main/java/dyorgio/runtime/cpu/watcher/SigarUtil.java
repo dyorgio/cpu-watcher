@@ -19,7 +19,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.logging.Logger;
@@ -60,9 +62,19 @@ class SigarUtil {
 
                 System.setProperty("java.library.path", System.getProperty("java.library.path") + File.pathSeparatorChar + nativeLibTmpFile.getParent());
 
-                Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-                fieldSysPath.setAccessible(true);
-                fieldSysPath.set(null, null);
+                if (getJavaVersion() < 9) {
+                    Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+                    fieldSysPath.setAccessible(true);
+                    fieldSysPath.set(null, null);
+                } else {
+                    Method method = MethodHandles.class.getMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
+                    MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) method.invoke(null, ClassLoader.class, MethodHandles.lookup());
+                    method = MethodHandles.Lookup.class.getMethod("findStaticVarHandle", Class.class, String.class, Class.class);
+                    Object sys_paths = method.invoke(privateLookup, ClassLoader.class, "sys_paths", String[].class);
+                    method = sys_paths.getClass().getDeclaredMethod("set", sys_paths.getClass(), Object.class);
+                    method.setAccessible(true);
+                    method.invoke(null, sys_paths, null);
+                }
 
                 loader.load(nativeLibTmpFile.getParent());
 
@@ -81,9 +93,20 @@ class SigarUtil {
     public static int getCpuCount() throws SigarException {
         return InstanceHolder.INSTANCE.getCpuList().length;
     }
-    
+
     public static long getCurrentPid() throws SigarException {
         return InstanceHolder.INSTANCE.getPid();
+    }
+
+    public static int getJavaVersion() {
+        String version = System.getProperty("java.version");
+        if (version.startsWith("1.")) {
+            version = version.substring(2);
+        }
+        int dotPos = version.indexOf('.');
+        int dashPos = version.indexOf('-');
+        return Integer.parseInt(version.substring(0,
+                dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
     }
 
     private static class InstanceHolder {

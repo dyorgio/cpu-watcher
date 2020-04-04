@@ -39,7 +39,7 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
+            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
                 try {
                     return getProcessPID();
                 } catch (Exception ex) {
@@ -85,7 +85,7 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
+            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
                 try {
                     return getProcessPID();
                 } catch (Exception ex) {
@@ -131,7 +131,7 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
+            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
                 try {
                     return getProcessPID();
                 } catch (Exception ex) {
@@ -186,22 +186,28 @@ public class CpuWatcherTest {
         }
     }
 
-    private static int getProcessPID() throws Exception {
-        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-        Field jvm = runtime.getClass().getDeclaredField("jvm");
-        jvm.setAccessible(true);
-        Object mgmtObj = jvm.get(runtime);
-        Method pid_method = mgmtObj.getClass().getDeclaredMethod("getProcessId");
-        pid_method.setAccessible(true);
+    private static long getProcessPID() throws Exception {
+        if (SigarUtil.getJavaVersion() < 9) {
+            RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+            Field jvm = runtime.getClass().getDeclaredField("jvm");
+            jvm.setAccessible(true);
+            Object mgmtObj = jvm.get(runtime);
+            Method pid_method = mgmtObj.getClass().getDeclaredMethod("getProcessId");
+            pid_method.setAccessible(true);
 
-        return (Integer) pid_method.invoke(mgmtObj);
+            return ((Integer) pid_method.invoke(mgmtObj)).longValue();
+        } else {
+            Class processHandleClass = Class.forName("java.lang.ProcessHandle");
+            Object currentProcessHandle = processHandleClass.getMethod("current").invoke(null);
+            return (long) processHandleClass.getMethod("pid").invoke(currentProcessHandle);
+        }
     }
 
     private static float calculateUsagePercentage(int count, float[] usages, CpuWatcher cpuWatcher, float expectedMinimum, float expectedMaximum) throws InterruptedException {
         float usagePercent = 0;
-        for (int i = 0; i < 3; i++) {
-            if (i > 0) {
-                System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.calculateUsagePercentage(): previous usage:" + usagePercent
+        for (int i = 1; i <= 10; i++) {
+            if (i > 1) {
+                System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.calculateUsagePercentage(" + i + "): previous usage:" + usagePercent
                         + ", expectedMinimun:" + expectedMinimum + ", expectedMaximum:" + expectedMaximum);
             }
             usagePercent = calculateUsagePercentage(count, usages, cpuWatcher);

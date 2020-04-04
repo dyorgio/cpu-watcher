@@ -100,6 +100,15 @@ public final class CpuWatcher extends Thread {
         CpuTimeSnapshot current;
         CpuTimeSnapshot prev = processWatcher.getCpuTimes();
 
+        Thread resumeProcessHook = new Thread("Resume CpuWatcher Process") {
+            @Override
+            public void run() {
+                processWatcher.resume();
+            }
+        };
+
+        Runtime.getRuntime().addShutdownHook(resumeProcessHook);
+
         Float localUsageLimit;
         float cpuUsage;
 
@@ -151,6 +160,7 @@ public final class CpuWatcher extends Thread {
             } finally {
                 try {
                     processWatcher.resume();
+                    Runtime.getRuntime().removeShutdownHook(resumeProcessHook);
                 } catch (Exception ex) {
                     //ignore
                 }
@@ -186,15 +196,11 @@ public final class CpuWatcher extends Thread {
         }
 
         Float limit = args.length == 2 ? Float.valueOf(args[1]) : null;
-        CpuWatcher watcher = new CpuWatcher(Integer.parseInt(args[0]), limit);
+        final CpuWatcher watcher = new CpuWatcher(Integer.parseInt(args[0]), limit);
         watcher.start();
-        if (limit != null) {
-            while (!Thread.currentThread().isInterrupted()) {
-                System.out.println(watcher.getCpuUsage());
-                Thread.sleep(1000);
-            }
-        } else {
-            watcher.join();
+        while (!Thread.currentThread().isInterrupted()) {
+            System.out.println(watcher.getCpuUsage());
+            Thread.sleep(1000);
         }
     }
 }
