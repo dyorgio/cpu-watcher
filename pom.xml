@@ -64,7 +64,7 @@
         <version.sigar.base>1.6.5</version.sigar.base>
         <version.sigar>${version.sigar.base}.132-7</version.sigar>
         <version.sigar-dist>${version.sigar.base}.132-6</version.sigar-dist>
-        <version.junit>4.12</version.junit>
+        <version.junit>4.13.1</version.junit>
         <version.out-process>1.2.7-SNAPSHOT</version.out-process>
     </properties>
     
