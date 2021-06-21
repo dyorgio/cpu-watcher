@@ -59,25 +59,8 @@ class SigarUtil {
                         output.flush();
                     }
                 }
-
-                System.setProperty("java.library.path", System.getProperty("java.library.path") + File.pathSeparatorChar + nativeLibTmpFile.getParent());
-
-                if (getJavaVersion() < 9) {
-                    Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-                    fieldSysPath.setAccessible(true);
-                    fieldSysPath.set(null, null);
-                } else {
-                    Method method = MethodHandles.class.getMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
-                    MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) method.invoke(null, ClassLoader.class, MethodHandles.lookup());
-                    method = MethodHandles.Lookup.class.getMethod("findStaticVarHandle", Class.class, String.class, Class.class);
-                    Object sys_paths = method.invoke(privateLookup, ClassLoader.class, "sys_paths", String[].class);
-                    method = sys_paths.getClass().getDeclaredMethod("set", sys_paths.getClass(), Object.class);
-                    method.setAccessible(true);
-                    method.invoke(null, sys_paths, null);
-                }
-
-                loader.load(nativeLibTmpFile.getParent());
-
+                
+                System.setProperty("org.hyperic.sigar.path", nativeLibTmpFile.getParent());
             } else {
                 LOGGER.info("No native libs found in jar, letting the normal load mechanisms figger it out.");
             }

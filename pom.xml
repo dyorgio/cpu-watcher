@@ -59,11 +59,11 @@
         <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
         <version.maven.shade.plugin>3.1.1</version.maven.shade.plugin>
         
-        <version.jna>5.6.0</version.jna>
+        <version.jna>5.8.0</version.jna>
         <version.sigar.base>1.6.5</version.sigar.base>
         <version.sigar>${version.sigar.base}.132-7</version.sigar>
         <version.sigar-dist>${version.sigar.base}.132-6</version.sigar-dist>
-        <version.junit>4.13.1</version.junit>
+        <version.junit>4.13.2</version.junit>
         <version.out-process>1.2.7</version.out-process>
     </properties>
     
@@ -219,7 +219,7 @@
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>com/sun/jna/aix*/*.*</exclude>
-                                        <exclude>com/sun/jna/darwin/*.*</exclude>
+                                        <exclude>com/sun/jna/darwin-*/*.*</exclude>
                                         <exclude>com/sun/jna/freebsd-*/*.*</exclude>
                                         <exclude>com/sun/jna/openbsd-*/*.*</exclude>
                                         <exclude>com/sun/jna/sunos-*/*.*</exclude>
@@ -260,7 +260,7 @@
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>com/sun/jna/aix*/*.*</exclude>
-                                        <exclude>com/sun/jna/darwin/*.*</exclude>
+                                        <exclude>com/sun/jna/darwin-*/*.*</exclude>
                                         <exclude>com/sun/jna/freebsd-*/*.*</exclude>
                                         <exclude>com/sun/jna/openbsd-*/*.*</exclude>
                                         <exclude>com/sun/jna/sunos-*/*.*</exclude>
@@ -452,7 +452,7 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <exclude>com/sun/jna/darwin/*.*</exclude>
+                                        <exclude>com/sun/jna/darwin-*/*.*</exclude>
                                         <exclude>com/sun/jna/aix*/*.*</exclude>
                                         <exclude>com/sun/jna/freebsd-*/*.*</exclude>
                                         <exclude>com/sun/jna/openbsd-*/*.*</exclude>
@@ -596,9 +596,9 @@
                         <version>1.4.0</version>
                         <configuration>
                             <description>
-                                Improved getCpuUsage() precision.
-                                Added unit tests.
-                                Improved support to Java &gt; 9.
+                                Fixed sigar lib loading (use special variable to update native path), more simple and compatible.
+                                Upgraded JNA dep version.
+                                Upgraded JUnit dep version.
                             </description>
                             <releaseName>${project.version}</releaseName>
                             <tag>${project.version}</tag>
