@@ -64,17 +64,6 @@
         <version.out-process>1.2.7</version.out-process>
     </properties>
     
-    <repositories>
-        <repository>
-            <id>sigar-jboss</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/</url>
-        </repository>
-        <repository>
-            <id>sigar-redhat</id>
-            <url>https://maven.repository.redhat.com/ga/</url>
-        </repository>
-    </repositories>
-    
     <dependencies>
         <dependency>
             <groupId>com.github.oshi</groupId>
@@ -232,8 +221,6 @@
                                         <resource>.so</resource>
                                         <resource>.sl</resource>
                                         <resource>.dylib</resource>
-                                        <resource>sigar-x86-winnt.dll</resource>
-                                        <resource>sigar-x86-winnt.lib</resource>
                                     </resources>
                                 </transformer>
                             </transformers>
@@ -265,7 +252,6 @@
                                         <resource>.a</resource>
                                         <resource>.so</resource>
                                         <resource>.sl</resource>
-                                        <resource>libsigar-universal-macosx.dylib</resource>
                                     </resources>
                                 </transformer>
                             </transformers>
@@ -328,17 +314,6 @@
                                         <resource>.a</resource>
                                         <resource>.dylib</resource>
                                         <resource>.sl</resource>
-                                        <resource>libsigar-amd64-freebsd-6.so</resource>
-                                        <resource>libsigar-amd64-solaris.so</resource>
-                                        <resource>libsigar-ia64-hpux.so</resource>
-                                        <resource>libsigar-pa-hpux.so</resource>
-                                        <resource>libsigar-ppc-aix-5.so</resource>
-                                        <resource>libsigar-ppc64-aix-5.so</resource>
-                                        <resource>libsigar-sparc-solaris.so</resource>
-                                        <resource>libsigar-sparc64-solaris.so</resource>
-                                        <resource>libsigar-x86-freebsd-5.so</resource>
-                                        <resource>libsigar-x86-freebsd-6.so</resource>
-                                        <resource>libsigar-x86-solaris.so</resource>
                                     </resources>
                                 </transformer>
                             </transformers>
@@ -370,21 +345,6 @@
                                         <resource>.a</resource>
                                         <resource>.dylib</resource>
                                         <resource>.sl</resource>
-                                        <resource>libsigar-amd64-freebsd-6.so</resource>
-                                        <resource>libsigar-amd64-solaris.so</resource>
-                                        <resource>libsigar-ia64-hpux.so</resource>
-                                        <resource>libsigar-ia64-linux.so</resource>
-                                        <resource>libsigar-pa-hpux.so</resource>
-                                        <resource>libsigar-ppc-aix-5.so</resource>
-                                        <resource>libsigar-ppc64-aix-5.so</resource>
-                                        <resource>libsigar-ppc-linux.so</resource>
-                                        <resource>libsigar-ppc64-linux.so</resource>
-                                        <resource>libsigar-s390x-linux.so</resource>
-                                        <resource>libsigar-sparc-solaris.so</resource>
-                                        <resource>libsigar-sparc64-solaris.so</resource>
-                                        <resource>libsigar-x86-freebsd-5.so</resource>
-                                        <resource>libsigar-x86-freebsd-6.so</resource>
-                                        <resource>libsigar-x86-solaris.so</resource>
                                     </resources>
                                 </transformer>
                             </transformers>
@@ -421,23 +381,7 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
                                     <resources>
                                         <resource>.a</resource>
-                                        <resource>libsigar-universal-macosx.dylib</resource>
                                         <resource>.sl</resource>
-                                        <resource>libsigar-amd64-freebsd-6.so</resource>
-                                        <resource>libsigar-amd64-solaris.so</resource>
-                                        <resource>libsigar-ia64-hpux.so</resource>
-                                        <resource>libsigar-ia64-linux.so</resource>
-                                        <resource>libsigar-pa-hpux.so</resource>
-                                        <resource>libsigar-ppc-aix-5.so</resource>
-                                        <resource>libsigar-ppc64-aix-5.so</resource>
-                                        <resource>libsigar-ppc-linux.so</resource>
-                                        <resource>libsigar-ppc64-linux.so</resource>
-                                        <resource>libsigar-s390x-linux.so</resource>
-                                        <resource>libsigar-sparc-solaris.so</resource>
-                                        <resource>libsigar-sparc64-solaris.so</resource>
-                                        <resource>libsigar-x86-freebsd-5.so</resource>
-                                        <resource>libsigar-x86-freebsd-6.so</resource>
-                                        <resource>libsigar-x86-solaris.so</resource>
                                     </resources>
                                 </transformer>
                             </transformers>
@@ -446,11 +390,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>${project.build.directory}/hyperic-sigar-${version.sigar.base}/sigar-bin/lib</directory>
-            </resource>
-        </resources>
     </build>
     
     <profiles>
