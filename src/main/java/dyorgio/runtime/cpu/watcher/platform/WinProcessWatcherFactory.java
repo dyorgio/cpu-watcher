@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,18 @@ import dyorgio.runtime.cpu.watcher.AbstractProcessWatcherFactory;
 public class WinProcessWatcherFactory extends AbstractProcessWatcherFactory {
 
     @Override
-    public AbstractProcessWatcher createWatcher(long pid) {
+    public AbstractProcessWatcher createWatcher(int pid) {
         return new WinProcessWatcher(pid);
+    }
+
+    @Override
+    public int getCurrentPid() {
+        return Kernel32.INSTANCE.GetCurrentProcessId();
     }
 
     private static final class WinProcessWatcher extends AbstractProcessWatcher {
 
-        WinProcessWatcher(final long pid) {
+        WinProcessWatcher(final int pid) {
             super(pid);
         }
 

@@ -5,7 +5,7 @@
     
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>1.2.5-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     
     <packaging>jar</packaging>
     
@@ -59,10 +59,7 @@
         <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
         <version.maven.shade.plugin>3.1.1</version.maven.shade.plugin>
         
-        <version.jna>5.8.0</version.jna>
-        <version.sigar.base>1.6.5</version.sigar.base>
-        <version.sigar>${version.sigar.base}.132-7</version.sigar>
-        <version.sigar-dist>${version.sigar.base}.132-6</version.sigar-dist>
+        <version.oshi>6.0.0</version.oshi>
         <version.junit>4.13.2</version.junit>
         <version.out-process>1.2.7</version.out-process>
     </properties>
@@ -80,21 +77,9 @@
     
     <dependencies>
         <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-            <version>${version.jna}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hyperic</groupId>
-            <artifactId>sigar</artifactId>
-            <version>${version.sigar}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hyperic</groupId>
-            <artifactId>sigar-dist</artifactId>
-            <type>zip</type>
-            <version>${version.sigar-dist}</version>
-            <scope>provided</scope>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>${version.oshi}</version>
         </dependency>
 
         <dependency>
@@ -151,41 +136,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-sigar-lib-to-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeGroupIds>org.hyperic</includeGroupIds>
-                            <includeArtifactIds>sigar-dist</includeArtifactIds>
-                            <includes>**/sigar-bin/lib/*</includes>
-                            <excludes>**/sigar-bin/lib/*jar</excludes>
-                            <outputDirectory>
-                                ${project.build.directory}
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${version.maven.surefire.plugin}</version>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>java.library.path</name>
-                            <value>${project.build.directory}/hyperic-sigar-${version.sigar.base}/sigar-bin/lib/</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -596,9 +546,8 @@
                         <version>1.4.0</version>
                         <configuration>
                             <description>
-                                Fixed sigar lib loading (use special variable to update native path), more simple and compatible.
-                                Upgraded JNA dep version.
-                                Upgraded JUnit dep version.
+                                Removed Sugar dependency (very old, unmaintained), replace it with OSHI.
+                                Limiter logic rewritten to be more accurate and adaptable.
                             </description>
                             <releaseName>${project.version}</releaseName>
                             <tag>${project.version}</tag>

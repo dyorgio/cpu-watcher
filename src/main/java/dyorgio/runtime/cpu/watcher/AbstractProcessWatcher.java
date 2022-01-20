@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher;
 
-import org.hyperic.sigar.ProcCpu;
+import oshi.software.os.OSProcess;
 
 /**
  *
@@ -23,10 +23,10 @@ import org.hyperic.sigar.ProcCpu;
  */
 public abstract class AbstractProcessWatcher {
 
-    protected final long pid;
+    protected final int pid;
     protected boolean resumed = true;
 
-    protected AbstractProcessWatcher(final long pid) {
+    protected AbstractProcessWatcher(final int pid) {
         this.pid = pid;
     }
 
@@ -50,8 +50,9 @@ public abstract class AbstractProcessWatcher {
 
     public CpuTimeSnapshot getCpuTimes() {
         try {
-            ProcCpu procCpu = SigarUtil.getSigar().getProcCpu(this.pid);
-            return new CpuTimeSnapshot(procCpu.getTotal(), procCpu.getLastTime());
+            OSProcess osProcess = CpuWatcher.OPERATING_SYSTEM.getProcess(this.pid);
+           // osProcess.getProcessCpuLoadBetweenTicks(osProcess)
+            return new CpuTimeSnapshot(osProcess.getUserTime() + osProcess.getKernelTime(), osProcess.getUpTime());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

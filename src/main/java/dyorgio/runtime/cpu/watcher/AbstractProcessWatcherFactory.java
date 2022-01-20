@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher;
 
-import dyorgio.runtime.cpu.watcher.platform.LinuxProcessWatcherFactory;
-import dyorgio.runtime.cpu.watcher.platform.MacProcessWatcherFactory;
+import dyorgio.runtime.cpu.watcher.platform.PosixProcessWatcherFactory;
 import dyorgio.runtime.cpu.watcher.platform.WinProcessWatcherFactory;
 import java.util.Locale;
 
@@ -32,13 +31,11 @@ public abstract class AbstractProcessWatcherFactory {
         try {
             String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
             if ((OS.contains("mac")) || (OS.contains("darwin"))) {
-
-                INSTANCE = new MacProcessWatcherFactory();
-
+                INSTANCE = new PosixProcessWatcherFactory(true);
             } else if (OS.contains("win")) {
                 INSTANCE = new WinProcessWatcherFactory();
             } else if (OS.contains("nux")) {
-                INSTANCE = new LinuxProcessWatcherFactory();
+                INSTANCE = new PosixProcessWatcherFactory(false);
             } else {
                 throw new RuntimeException("Unsupported OS:" + OS);
             }
@@ -47,7 +44,9 @@ public abstract class AbstractProcessWatcherFactory {
         }
     }
 
-    public abstract AbstractProcessWatcher createWatcher(long pid);
+    public abstract AbstractProcessWatcher createWatcher(int pid);
+
+    public abstract int getCurrentPid();
 
     public static AbstractProcessWatcherFactory getInstance() {
         return INSTANCE;

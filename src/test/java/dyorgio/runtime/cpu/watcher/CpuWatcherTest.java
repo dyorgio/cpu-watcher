@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,10 @@ package dyorgio.runtime.cpu.watcher;
 import dyorgio.runtime.out.process.CallableSerializable;
 import dyorgio.runtime.out.process.OutProcessExecutorService;
 import dyorgio.runtime.out.process.RunnableSerializable;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -39,9 +35,9 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
+            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
                 try {
-                    return getProcessPID();
+                    return AbstractProcessWatcherFactory.getInstance().getCurrentPid();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -65,7 +61,7 @@ public class CpuWatcherTest {
                 float[] usages = new float[count];
                 float usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 95, 100);
                 System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testWatch():" + usagePercent);
-                Assert.assertThat("Cpu usage needs to be greater than 95%.", usagePercent, Matchers.greaterThan(95f));
+                assertThat("Cpu usage needs to be greater than 95%.", usagePercent, Matchers.greaterThan(95f));
             } finally {
                 cpuWatcher.interrupt();
                 cpuWatcher.join(3000);
@@ -85,9 +81,9 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
+            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
                 try {
-                    return getProcessPID();
+                    return AbstractProcessWatcherFactory.getInstance().getCurrentPid();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -111,7 +107,7 @@ public class CpuWatcherTest {
                 float[] usages = new float[count];
                 float usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 35, 55);
                 System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testLimit(%):" + usagePercent);
-                Assert.assertThat("Cpu usage needs to be less than 55%.", usagePercent, Matchers.lessThan(55f));
+                assertThat("Cpu usage needs to be less than 55%.", usagePercent, Matchers.lessThan(55f));
             } finally {
                 cpuWatcher.interrupt();
                 cpuWatcher.join(3000);
@@ -131,9 +127,9 @@ public class CpuWatcherTest {
         OutProcessExecutorService sharedProcess = null;
         try {
             sharedProcess = new OutProcessExecutorService("-Xmx32m");
-            Long jvmPID = sharedProcess.submit((CallableSerializable<Long>) () -> {
+            Integer jvmPID = sharedProcess.submit((CallableSerializable<Integer>) () -> {
                 try {
-                    return getProcessPID();
+                    return AbstractProcessWatcherFactory.getInstance().getCurrentPid();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -157,21 +153,28 @@ public class CpuWatcherTest {
                 float[] usages = new float[count];
                 float usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 35, 55);
                 System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testLimitAndUnlimit(1):" + usagePercent);
-                Assert.assertThat("Cpu usage needs to be less than 55%.", usagePercent, Matchers.lessThan(55f));
+                assertThat("Cpu usage needs to be less than 55%.", usagePercent, Matchers.lessThan(55f));
 
                 cpuWatcher.setUsageLimit(null);
                 cpuWatcher.getProcessWatcher().resume();
                 Thread.sleep(500);
                 usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 95, 105);
                 System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testLimitAndUnlimit(2):" + usagePercent);
-                Assert.assertThat("Cpu usage needs to be greater than 95%.", usagePercent, Matchers.greaterThan(95f));
+                assertThat("Cpu usage needs to be greater than 95%.", usagePercent, Matchers.greaterThan(95f));
 
                 cpuWatcher.setUsageLimit(25f * CpuWatcher.getOneCoreOnePercent());
                 cpuWatcher.getProcessWatcher().resume();
                 Thread.sleep(500);
                 usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 15, 30);
                 System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testLimitAndUnlimit(3):" + usagePercent);
-                Assert.assertThat("Cpu usage needs to be less than 30%.", usagePercent, Matchers.lessThan(30f));
+                assertThat("Cpu usage needs to be less than 30%.", usagePercent, Matchers.lessThan(30f));
+                
+                cpuWatcher.setUsageLimit(5f * CpuWatcher.getOneCoreOnePercent());
+                cpuWatcher.getProcessWatcher().resume();
+                Thread.sleep(500);
+                usagePercent = calculateUsagePercentage(count, usages, cpuWatcher, 1, 10);
+                System.out.println("dyorgio.runtime.cpu.watcher.CpuWatcherTest.testLimitAndUnlimit(4):" + usagePercent);
+                assertThat("Cpu usage needs to be less than 10%.", usagePercent, Matchers.lessThan(10f));
             } finally {
                 cpuWatcher.interrupt();
                 cpuWatcher.join(3000);
@@ -183,23 +186,6 @@ public class CpuWatcherTest {
                 sharedProcess.awaitTermination(3, TimeUnit.SECONDS);
                 sharedProcess.shutdownNow();
             }
-        }
-    }
-
-    private static long getProcessPID() throws Exception {
-        if (SigarUtil.getJavaVersion() < 9) {
-            RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-            Field jvm = runtime.getClass().getDeclaredField("jvm");
-            jvm.setAccessible(true);
-            Object mgmtObj = jvm.get(runtime);
-            Method pid_method = mgmtObj.getClass().getDeclaredMethod("getProcessId");
-            pid_method.setAccessible(true);
-
-            return ((Integer) pid_method.invoke(mgmtObj)).longValue();
-        } else {
-            Class processHandleClass = Class.forName("java.lang.ProcessHandle");
-            Object currentProcessHandle = processHandleClass.getMethod("current").invoke(null);
-            return (long) processHandleClass.getMethod("pid").invoke(currentProcessHandle);
         }
     }
 
@@ -221,6 +207,7 @@ public class CpuWatcherTest {
         return usagePercent;
     }
 
+    @SuppressWarnings("SleepWhileInLoop")
     private static float calculateUsagePercentage(int count, float[] usages, CpuWatcher cpuWatcher) throws InterruptedException {
         for (int i = 0; i < count; i++) {
             usages[i] = cpuWatcher.getCpuUsage();

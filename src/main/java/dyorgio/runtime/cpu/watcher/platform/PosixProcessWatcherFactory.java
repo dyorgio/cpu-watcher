@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,25 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher.platform;
 
+import dyorgio.runtime.cpu.watcher.AbstractPosixProcessWatcherFactory;
 import dyorgio.runtime.cpu.watcher.PosixProcessWatcher;
 import dyorgio.runtime.cpu.watcher.AbstractProcessWatcher;
-import dyorgio.runtime.cpu.watcher.AbstractProcessWatcherFactory;
 
 /**
  *
  * @author dyorgio
  */
-public class LinuxProcessWatcherFactory extends AbstractProcessWatcherFactory {
+public class PosixProcessWatcherFactory extends AbstractPosixProcessWatcherFactory {
+    
+    private final boolean mac;
+    
+    public PosixProcessWatcherFactory(boolean mac){
+        this.mac = mac;
+    }
 
     @Override
-    public AbstractProcessWatcher createWatcher(long pid) {
-        return new PosixProcessWatcher(pid);
+    public AbstractProcessWatcher createWatcher(int pid) {
+        return new PosixProcessWatcher(pid, mac);
     }
+
 }

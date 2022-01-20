@@ -1,5 +1,5 @@
 /** *****************************************************************************
- * Copyright 2020 See AUTHORS file.
+ * Copyright 2022 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  ***************************************************************************** */
 package dyorgio.runtime.cpu.watcher;
 
-import org.hyperic.sigar.SigarException;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
 /**
  *
@@ -23,25 +24,42 @@ import org.hyperic.sigar.SigarException;
  */
 public class PosixProcessWatcher extends AbstractProcessWatcher {
 
-    public PosixProcessWatcher(long pid) {
+    private static final int SIGSTOP = 19;
+    private static final int SIGCONT = 18;
+    
+    private static final int SIGSTOP_MAC = 17;
+    private static final int SIGCONT_MAC = 19;
+    
+    private final int sigstop;
+    private final int sigcont;
+
+    public PosixProcessWatcher(int pid, boolean mac) {
         super(pid);
+        if (mac) {
+            sigstop = SIGSTOP_MAC;
+            sigcont = SIGCONT_MAC;
+        } else {
+            sigstop = SIGSTOP;
+            sigcont = SIGCONT;
+        }
     }
 
     @Override
     protected void suspendImpl() {
-        try {
-            SigarUtil.getSigar().kill(pid, "SIGSTOP");
-        } catch (SigarException ex) {
-            throw new RuntimeException(ex);
-        }
+        CLibrary.INSTANCE.kill((int) pid, sigstop);
     }
 
     @Override
     protected void resumeImpl() {
-        try {
-            SigarUtil.getSigar().kill(pid, "SIGCONT");
-        } catch (SigarException ex) {
-            throw new RuntimeException(ex);
-        }
+        CLibrary.INSTANCE.kill((int) pid, sigcont);
+    }
+
+    interface CLibrary extends Library {
+
+        CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
+
+        int getpid();
+
+        void kill(int pid, int signal);
     }
 }
