@@ -5,7 +5,7 @@
     
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     
     <packaging>jar</packaging>
     
@@ -495,6 +495,7 @@
                                 Limiter logic rewritten to be more accurate and adaptable.
                             </description>
                             <releaseName>${project.version}</releaseName>
+                            <tag>${project.version}</tag>
                             <fileSets>
                                 <fileSet>
                                     <directory>${project.build.directory}</directory>
