@@ -43,26 +43,11 @@ java -jar cpu-watcher-$VERSION.jar $PID $MAX_CPU
 
 Maven
 -----
-With common platforms support (Windows 32/64bits, Linux Desktop 32/64bits and Mac 64bits):
+
 ```xml
 <dependency>
     <groupId>com.github.dyorgio.runtime</groupId>
     <artifactId>cpu-watcher</artifactId>
-    <version>1.3.0</version>
-    <!-- no classifier -->
+    <version>1.3.1</version>
 </dependency>
 ```
-
-With only one platform (win-universal, win-x64, mac-universal, mac-x64, linux-universal, linux-desktop-universal):
-```xml
-<dependency>
-    <groupId>com.github.dyorgio.runtime</groupId>
-    <artifactId>cpu-watcher</artifactId>
-    <version>1.3.0</version>
-    <classifier>${platform}</classifier>
-</dependency>
-```
-
-For other platforms (aix, ppc, solaris, freebsd, etc..) download source and adjust pom.xml.
-
-* No native Apple Silicon support, it only be possible when sigar lib has.

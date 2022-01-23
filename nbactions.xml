@@ -8,6 +8,9 @@
             <goal>release:prepare</goal>
             <goal>release:perform</goal>
         </goals>
+        <properties>
+            <skipTests>true</skipTests>
+        </properties>
         <activatedProfiles>
             <activatedProfile>release</activatedProfile>
         </activatedProfiles>
