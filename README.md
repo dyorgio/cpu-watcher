@@ -1,6 +1,6 @@
 Cpu Watcher
 ===============
-[![Build Status](https://travis-ci.org/dyorgio/cpu-watcher.svg?branch=master)](https://travis-ci.org/dyorgio/cpu-watcher) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher/badge.svg?1)](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher)
+[![Build Status](https://app.travis-ci.com/dyorgio/cpu-watcher.svg?branch=master)](https://travis-ci.com/dyorgio/cpu-watcher) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher/badge.svg?1)](https://maven-badges.herokuapp.com/maven-central/com.github.dyorgio.runtime/cpu-watcher)
 
 A Java Library/App to monitor/limit another process CPU usage.
 
