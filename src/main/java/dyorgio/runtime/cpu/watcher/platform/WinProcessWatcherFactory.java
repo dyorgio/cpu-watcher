@@ -42,36 +42,63 @@ public class WinProcessWatcherFactory extends AbstractProcessWatcherFactory {
 
     private static final class WinProcessWatcher extends AbstractProcessWatcher {
 
+        private volatile WinNT.HANDLE process = null;
+
         WinProcessWatcher(final int pid) {
             super(pid);
         }
 
         @Override
         protected void suspendImpl() {
-            WinNT.HANDLE process = null;
-            try {
-                process = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_SUSPEND_RESUME, false, (int) pid);
-                if (process != null) {
-                    NtDllExt.INSTANCE.NtSuspendProcess(process);
+            WinNT.HANDLE processLocal = this.process;
+            if (processLocal == null) {
+                synchronized (this) {
+                    processLocal = this.process;
+                    if (processLocal == null) {
+                        this.process = processLocal = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_SUSPEND_RESUME, false, (int) pid);
+                    }
                 }
-            } finally {
-                if (process != null) {
-                    Kernel32.INSTANCE.CloseHandle(process);
-                }
+            }
+            if (processLocal != null) {
+                NtDllExt.INSTANCE.NtSuspendProcess(processLocal);
             }
         }
 
         @Override
         protected void resumeImpl() {
-            WinNT.HANDLE process = null;
-            try {
-                process = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_SUSPEND_RESUME, false, (int) pid);
-                if (process != null) {
-                    NtDllExt.INSTANCE.NtResumeProcess(process);
+            WinNT.HANDLE processLocal = this.process;
+            if (processLocal == null) {
+                synchronized (this) {
+                    processLocal = this.process;
+                    if (processLocal == null) {
+                        this.process = processLocal = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_SUSPEND_RESUME, false, (int) pid);
+                    }
                 }
-            } finally {
-                if (process != null) {
-                    Kernel32.INSTANCE.CloseHandle(process);
+            }
+            if (processLocal != null) {
+                NtDllExt.INSTANCE.NtResumeProcess(process);
+            }
+        }
+
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            if (process != null) {
+                Kernel32.INSTANCE.CloseHandle(process);
+            }
+            super.finalize();
+        }
+
+        @Override
+        public void freeResources() {
+            WinNT.HANDLE processLocal = this.process;
+            if (processLocal != null) {
+                synchronized (this) {
+                    processLocal = this.process;
+                    if (processLocal != null) {
+                        Kernel32.INSTANCE.CloseHandle(process);
+                        this.process = null;
+                    }
                 }
             }
         }
@@ -79,7 +106,8 @@ public class WinProcessWatcherFactory extends AbstractProcessWatcherFactory {
 
     private static interface NtDllExt extends NtDll {
 
-        NtDllExt INSTANCE = Native.loadLibrary("NtDll", NtDllExt.class, W32APIOptions.DEFAULT_OPTIONS);
+        @SuppressWarnings("FieldNameHidesFieldInSuperclass")
+        NtDllExt INSTANCE = Native.load("NtDll", NtDllExt.class, W32APIOptions.DEFAULT_OPTIONS);
 
         public int NtResumeProcess(HANDLE handle);
 

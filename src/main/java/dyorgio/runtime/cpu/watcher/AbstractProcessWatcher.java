@@ -61,4 +61,6 @@ public abstract class AbstractProcessWatcher {
     protected abstract void suspendImpl();
 
     protected abstract void resumeImpl();
+    
+    public abstract void freeResources();
 }

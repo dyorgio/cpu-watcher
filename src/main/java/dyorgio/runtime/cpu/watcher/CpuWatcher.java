@@ -125,6 +125,7 @@ public final class CpuWatcher extends Thread {
             try {
                 localUsageLimit = this.usageLimit;
                 if (localUsageLimit == null) {
+                    processWatcher.freeResources();
                     while (this.usageLimit == null) {
                         Thread.sleep(25);
                     }

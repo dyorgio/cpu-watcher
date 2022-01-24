@@ -26,10 +26,10 @@ public class PosixProcessWatcher extends AbstractProcessWatcher {
 
     private static final int SIGSTOP = 19;
     private static final int SIGCONT = 18;
-    
+
     private static final int SIGSTOP_MAC = 17;
     private static final int SIGCONT_MAC = 19;
-    
+
     private final int sigstop;
     private final int sigcont;
 
@@ -52,6 +52,11 @@ public class PosixProcessWatcher extends AbstractProcessWatcher {
     @Override
     protected void resumeImpl() {
         CLibrary.INSTANCE.kill((int) pid, sigcont);
+    }
+
+    @Override
+    public void freeResources() {
+        // Nothing to free on Posix
     }
 
     interface CLibrary extends Library {
