@@ -59,7 +59,7 @@
         <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
         <version.maven.shade.plugin>3.1.1</version.maven.shade.plugin>
         
-        <version.oshi>6.0.0</version.oshi>
+        <version.oshi>6.1.0</version.oshi>
         <version.junit>4.13.2</version.junit>
         <version.out-process>1.2.7</version.out-process>
     </properties>
